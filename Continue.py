@@ -4,5 +4,5 @@ while var > 0:  #iterate loop
     if var == 5:    #condition 1
         continue    #continue statement 
         #display result 
-    print ('/nCurrent variable value : ', var)
-print ("/nGood bye!")
+    print ('\nCurrent variable value : ', var)
+print ("\nGood bye!")
