@@ -33,7 +33,7 @@ def clean(matte):
 
 def paste(scene, person, matte):
     alpha = matte[:, :, None]
-    return (person * alpha + scene (1 alpha)).astype(np.uint8)
+    return (person * alpha + scene (1 - alpha)).astype(np.uint8)
 
 
 def final_photo(copies):
@@ -71,4 +71,30 @@ while True:
         centre = (view.shape[1] // 2 - 40, view.shape[0] // 2 + 50)
         cv2.putText(view, str(int(freeze_at - time.time()) + 1), centre, FONT, 5, (255, 255, 255), 10)
     if time.time() < message_until:
-        cv2.putText
+        cv2.putText(view, message, (10, view.shape[0] - 15), FONT, 0.7, (0, 255, 255), 2)
+        cv2.putText(view, f"{len(copies)} copies SPACE freeze  s save  u undo  c clear  q quit", (10, 25), FONT, 0.6, (255, 255, 255), 2)
+        cv2.imshow("Cone Me", view)
+
+        code = cv2.waitKey(5)
+        key = chr(code & 255).lower() if code != -1 else ""
+        if key in("q", "\x1b") or cv2.getWindowProperty("Clone Me, cv2.WIND_PROP_VISIBLE") == 0:
+            break
+        if key == " ":
+            if time.time() - last_space > 0.7 and not freeze_at:
+                freeze_at = time.time() + 3
+            last_space = time.time()
+        if key == "u" and copies:
+            copies.pop()
+        if key == "c":
+            copies.clear()
+        if key == "s":
+            if len(copies) < 2:
+                message = "Freeze yourself at least 2 times first. Nothing saved."
+            else:
+                name = time.strftime("example.jpeg")
+                cv2.imwrite(os.path.join(HERE, name), final_photo(copies))
+                message = "Saved " + name
+            message_until = time.time() + 2
+
+video.release()
+cv2.destroyAllWindows()
